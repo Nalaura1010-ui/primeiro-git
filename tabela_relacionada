@@ -1,0 +1,25 @@
+import sqlite3
+
+conexao= sqlite3.connect("meubanco.db")
+cursor = conexao.cursor()
+
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS tabela_relacionada (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        usuario_id INTEGER NOT NULL,
+        curso_id INTEGER NOT NULL,
+        FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+        FOREIGN KEY (curso_id) REFERENCES cursos(id)
+        
+
+    )
+""")
+cursor.execute("""
+    INSERT INTO tabela_relacionada (usuario_id, curso_id)
+    SELECT usuarios.id, cursos.id
+    FROM usuarios, cursos
+
+    WHERE usuarios.status = 'ativo' AND cursos.cursos = 'Eng de produção'
+    """)
+conexao.commit()
+conexao.close()
