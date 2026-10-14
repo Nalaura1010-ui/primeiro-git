@@ -1,0 +1,45 @@
+import sqlite3
+
+conexao= sqlite3.connect("meubanco.db")
+conexao.execute("PRAGMA foreign_keys= ON")
+cursor = conexao.cursor()
+
+decisao= int(input("Digite 1 para excluir usuário e 2 para torná-lo inátivo."))
+
+
+cursor.execute("""
+SELECT id, nome, status
+FROM usuarios;
+""")
+
+
+linhas= cursor.fetchall()
+
+for id, nome, status in linhas:
+    print(f"{id} - {nome} ({status})")
+
+if decisao == 1:
+    id_escolhido = input("\nQual o id do usuário que deseja excluir? ")
+    cursor.execute("""
+        DELETE FROM usuarios
+        WHERE id = ?""",
+        (id_escolhido,)
+        )
+
+else:
+    id_escolhido = input("\nQual o id do usuário que deseja inativar? ")
+    cursor.execute("""
+    UPDATE usuarios
+    SET status = 'inativo'
+    WHERE id = ?""",
+    (id_escolhido,)
+    )
+
+if cursor.rowcount == 0:
+    print("Nenhum usuário encontrado com esse id.")
+else:
+    print("Ação efetuada com sucesso.")
+
+
+conexao.commit()
+conexao.close()

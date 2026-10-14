@@ -1,0 +1,357 @@
+COLINHA SQL — COMANDOS MAIS USADOS
+===================================
+
+1. CRIAR BANCO (SQLite)
+-----------------------
+import sqlite3
+conexao = sqlite3.connect("meubanco.db")
+cursor = conexao.cursor()
+
+
+2. CRIAR TABELA
+---------------
+CREATE TABLE usuarios (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT NOT NULL,
+    status TEXT NOT NULL
+);
+
+
+3. CRIAR TABELA SE NÃO EXISTIR
+------------------------------
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT NOT NULL,
+    status TEXT NOT NULL
+);
+
+
+4. INSERIR DADOS — INSERT
+-------------------------
+INSERT INTO usuarios (nome, status)
+VALUES ('Ana', 'ativo');
+
+
+Vários registros:
+
+INSERT INTO usuarios (nome, status)
+VALUES
+    ('Ana', 'ativo'),
+    ('João', 'inativo'),
+    ('Maria', 'ativo');
+
+
+5. CONSULTAR TODOS — SELECT
+---------------------------
+SELECT * FROM usuarios;
+
+
+6. SELECIONAR COLUNAS
+---------------------
+SELECT nome, status
+FROM usuarios;
+
+
+7. FILTRAR — WHERE
+------------------
+SELECT *
+FROM usuarios
+WHERE status = 'ativo';
+
+
+8. MAIS DE UMA CONDIÇÃO
+-----------------------
+SELECT *
+FROM usuarios
+WHERE status = 'ativo'
+AND nome = 'Ana';
+
+
+OU:
+
+SELECT *
+FROM usuarios
+WHERE status = 'ativo'
+OR status = 'inativo';
+
+
+9. ALTERAR DADOS — UPDATE
+-------------------------
+UPDATE usuarios
+SET status = 'inativo'
+WHERE id = 1;
+
+
+ATENÇÃO: sem WHERE, altera TODOS os registros.
+
+UPDATE usuarios
+SET status = 'inativo';
+
+
+10. DELETAR DADOS — DELETE
+--------------------------
+DELETE FROM usuarios
+WHERE id = 1;
+
+
+ATENÇÃO: sem WHERE, apaga TODOS os registros.
+
+DELETE FROM usuarios;
+
+
+11. ORDENAR — ORDER BY
+---------------------
+SELECT *
+FROM usuarios
+ORDER BY nome;
+
+
+Decrescente:
+
+SELECT *
+FROM usuarios
+ORDER BY nome DESC;
+
+
+12. LIMITAR RESULTADOS
+----------------------
+SELECT *
+FROM usuarios
+LIMIT 10;
+
+
+13. CONTAR — COUNT
+------------------
+SELECT COUNT(*)
+FROM usuarios;
+
+
+Contar somente ativos:
+
+SELECT COUNT(*)
+FROM usuarios
+WHERE status = 'ativo';
+
+
+14. BUSCAR TEXTO — LIKE
+-----------------------
+SELECT *
+FROM usuarios
+WHERE nome LIKE 'A%';
+
+
+A%   = começa com A
+%a   = termina com a
+%an% = contém "an"
+
+
+15. DIFERENTE — !=
+------------------
+SELECT *
+FROM usuarios
+WHERE status != 'ativo';
+
+
+16. INTERVALO — BETWEEN
+-----------------------
+SELECT *
+FROM usuarios
+WHERE id BETWEEN 1 AND 10;
+
+
+17. VÁRIAS OPÇÕES — IN
+----------------------
+SELECT *
+FROM usuarios
+WHERE status IN ('ativo', 'inativo');
+
+
+18. ADICIONAR COLUNA — ALTER TABLE
+----------------------------------
+ALTER TABLE usuarios
+ADD COLUMN idade INTEGER;
+
+
+19. RENOMEAR TABELA
+-------------------
+ALTER TABLE usuarios
+RENAME TO pessoas;
+
+
+20. EXCLUIR TABELA
+------------------
+DROP TABLE usuarios;
+
+
+21. EVITAR DUPLICADOS — DISTINCT
+--------------------------------
+SELECT DISTINCT status
+FROM usuarios;
+
+
+22. AGRUPAR — GROUP BY
+----------------------
+SELECT status, COUNT(*)
+FROM usuarios
+GROUP BY status;
+
+
+23. FILTRAR GRUPOS — HAVING
+---------------------------
+SELECT status, COUNT(*)
+FROM usuarios
+GROUP BY status
+HAVING COUNT(*) > 5;
+
+
+24. JUNTAR TABELAS — JOIN
+-------------------------
+SELECT usuarios.nome, pedidos.valor
+FROM usuarios
+JOIN pedidos
+ON usuarios.id = pedidos.usuario_id;
+
+
+25. SQLITE + PYTHON — SELECT
+----------------------------
+import sqlite3
+
+conexao = sqlite3.connect("meubanco.db")
+cursor = conexao.cursor()
+
+cursor.execute("""
+    SELECT *
+    FROM usuarios
+    WHERE status = 'ativo'
+""")
+
+dados = cursor.fetchall()
+
+for usuario in dados:
+    print(usuario)
+
+conexao.close()
+
+
+26. INSERT PELO PYTHON
+----------------------
+nome = "Ana"
+status = "ativo"
+
+cursor.execute("""
+    INSERT INTO usuarios (nome, status)
+    VALUES (?, ?)
+""", (nome, status))
+
+conexao.commit()
+
+
+27. UPDATE PELO PYTHON
+----------------------
+cursor.execute("""
+    UPDATE usuarios
+    SET status = ?
+    WHERE id = ?
+""", ("inativo", 1))
+
+conexao.commit()
+
+
+28. DELETE PELO PYTHON
+----------------------
+cursor.execute("""
+    DELETE FROM usuarios
+    WHERE id = ?
+""", (1,))
+
+conexao.commit()
+
+
+29. PEGAR TODOS OS RESULTADOS
+-----------------------------
+cursor.execute("SELECT * FROM usuarios")
+dados = cursor.fetchall()
+
+
+30. PEGAR UM ÚNICO RESULTADO
+----------------------------
+cursor.execute("""
+    SELECT *
+    FROM usuarios
+    WHERE id = ?
+""", (1,))
+
+usuario = cursor.fetchone()
+
+
+31. COMMIT
+----------
+Depois de INSERT, UPDATE ou DELETE:
+
+conexao.commit()
+
+
+32. FECHAR CONEXÃO
+-----------------
+conexao.close()
+
+
+33. O QUE CADA COMANDO FAZ
+--------------------------
+
+SELECT   -> consultar
+INSERT   -> adicionar
+UPDATE   -> alterar
+DELETE   -> apagar
+CREATE   -> criar
+ALTER    -> modificar estrutura
+DROP     -> excluir estrutura
+WHERE    -> filtrar
+ORDER BY -> ordenar
+GROUP BY -> agrupar
+JOIN     -> juntar tabelas
+LIMIT    -> limitar resultados
+COUNT    -> contar
+
+
+34. EXEMPLO COMPLETO
+--------------------
+import sqlite3
+
+conexao = sqlite3.connect("meubanco.db")
+cursor = conexao.cursor()
+
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS usuarios (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome TEXT NOT NULL,
+        status TEXT NOT NULL
+    )
+""")
+
+cursor.execute("""
+    INSERT INTO usuarios (nome, status)
+    VALUES (?, ?)
+""", ("Ana", "ativo"))
+
+cursor.execute("""
+    UPDATE usuarios
+    SET status = 'inativo'
+    WHERE id = ?
+""", (1,))
+
+cursor.execute("SELECT * FROM usuarios")
+
+usuarios = cursor.fetchall()
+
+for usuario in usuarios:
+    print(usuario)
+
+conexao.commit()
+conexao.close()
+
+
+DICA FINAL
+----------
+Sempre tenha cuidado com UPDATE e DELETE sem WHERE,
+porque eles podem alterar ou apagar TODOS os registros.

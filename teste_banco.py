@@ -12,3 +12,17 @@ cursor.execute("""
         status TEXT NOT NULL
     )
 """)
+cursor.execute("""
+    INSERT INTO usuarios (nome, status)
+    VALUES
+        ('Ana', 'ativo'),
+        ('João', 'inativo'),
+        ('Maria', 'ativo');
+
+
+"""
+
+)
+print("Usuários adicionados com sucesso!")
+conexao.commit()
+conexao.close()
