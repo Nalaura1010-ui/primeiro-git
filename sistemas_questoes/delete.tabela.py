@@ -10,7 +10,7 @@ cursor = conexao.cursor()
 
 
 cursor.execute("""
-DROP TABLE respostas_usuarios;
+DROP TABLE registro;
 """)
 print("Tabela apagada com sucesso!")
 conexao.commit()

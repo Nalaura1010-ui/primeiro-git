@@ -98,23 +98,69 @@ else:
 
     rotulos_dificuldade = {1: "Fácil (1)", 2: "Média (2)", 3: "Difícil (3)"}
     
-    # 6. Itera sobre cada questão sorteada para exibir e coletar a resposta
-    for q_id, nivel, enunciado in questoes:
-        nivel_texto = rotulos_dificuldade.get(nivel, str(nivel))
-        print(f"\n[ID Questão: {q_id}] - Nível: {nivel_texto}")
-        print(f"Enunciado: {enunciado}")
+    # Exemplo de loop organizado para tratar a escolha e validação
+    sobra = 3  # Número de questões a serem respondidas
+    confere=3
+    respondida1 = False
+    respondida2 = False
+    respondida3 = False
+
+    while sobra > 0:
+        print("\n=== QUESTÕES DISPONÍVEIS ===")
+        for i, (q_id, nivel, enunciado) in enumerate(questoes):
+            if respondida1 == False and nivel == 1:
+                print(f"\n[id Questão: {q_id}] - Nível: {rotulos_dificuldade.get(nivel, str(nivel))}")
+            elif respondida2 == False and nivel == 2:
+                print(f"\n[ID Questão: {q_id}] - Nível: {rotulos_dificuldade.get(nivel, str(nivel))}")
+            elif respondida3 == False and nivel == 3:
+                print(f"\n[ID Questão: {q_id}] - Nível: {rotulos_dificuldade.get(nivel, str(nivel))}")
+
+        escolhida = input(f"\nDigite o Nível da questão que deseja responder: ")
+        for q_id, nivel, enunciado in questoes:
+        # Estrutura condicional limpa e correta
+            if int(escolhida) == 1 and nivel == 1 and respondida1 == False:
+                resultado = input(f"Digite o resultado da questão {q_id} (1 para acerto, 0 para erro): ")
+                while resultado not in ['0', '1']:
+                    resultado = input("Resultado inválido. Por favor, digite 1 para acerto ou 0 para erro: ")
+                sobra -= 1
+                respondida1 = True
+                cursor.execute("""
+                    INSERT INTO resposta (nome, resultado, usuario_id, questao_id)
+                    VALUES (?, ?, ?, ?);
+                """, (usuario[1], int(resultado), usuario[0], q_id))
+
+
+            elif int(escolhida) == 2 and nivel == 2 and respondida2 == False:
+                resultado = input(f"Digite o resultado da questão {q_id} (1 para acerto, 0 para erro): ")
+                while resultado not in ['0', '1']:
+                    resultado = input("Resultado inválido. Por favor, digite 1 para acerto ou 0 para erro: ")
+                sobra -= 1
+                respondida2 = True
+                cursor.execute("""
+                    INSERT INTO resposta (nome, resultado, usuario_id, questao_id)
+                    VALUES (?, ?, ?, ?);
+                """, (usuario[1], int(resultado), usuario[0], q_id))
+
+            elif int(escolhida) == 3 and nivel == 3 and respondida3 == False:
+                resultado = input(f"Digite o resultado da questão {q_id} (1 para acerto, 0 para erro): ")
+                while resultado not in ['0', '1']:
+                    resultado = input("Resultado inválido. Por favor, digite 1 para acerto ou 0 para erro: ")
+                sobra -= 1
+                respondida3 = True
+                cursor.execute("""
+                    INSERT INTO resposta (nome, resultado, usuario_id, questao_id)
+                    VALUES (?, ?, ?, ?);
+                """, (usuario[1], int(resultado), usuario[0], q_id))
+
         
-        # Pede o resultado para esta questão específica
-        resultado = input(f"Digite o resultado da questão {q_id} (1 para acerto, 0 para erro): ")
-        
-        while resultado not in ['0', '1']:
-            resultado = input("Resultado inválido. Por favor, digite 1 para acerto ou 0 para erro: ")
-        
-        # Insere a resposta diretamente usando os dados que já temos em memória
-        cursor.execute("""
-            INSERT INTO resposta (nome, resultado, usuario_id, questao_id)
-            VALUES (?, ?, ?, ?);
-        """, (usuario[1], int(resultado), usuario[0], q_id))
+            # Insere a resposta diretamente usando os dados que já temos em memória
+ 
+        if confere == sobra:
+            print("\n[ERRO] essa questão não corresponde ao nível da questão sorteada. Por favor, escolha novamente.")
+            continue
+        else:
+            confere = sobra
+            print(f"\nQuestão {q_id} respondida com sucesso! Questões restantes: {sobra}")
 
     # Salva as alterações e fecha a conexão
     conexao.commit()
